@@ -1,0 +1,62 @@
+# install destor
+# ubuntu 16.04 amd64
+# prepare
+sudo apt-get install git libffi-dev libssl-dev libmount-dev libpcre3-dev automake zlib1g-dev libglib2.0-dev
+
+# install glib, version should >= 2.3.2
+wget http://ftp.gnome.org/pub/gnome/sources/glib/2.50/glib-2.50.0.tar.xz
+xz -d glib2.50.0.tar.xz
+tar xvf glib2.50.0.tar.xz
+cd glib2.50.0
+./configure --prefix=/usr/local
+make
+sudo make install
+
+# install automake-1.14
+wget http://ftp.gnu.org/gnu/automake/automake-1.14.tar.xz
+tar xvf automake-1.14.tar.gz
+cd automake-1.14
+./configure
+make
+sudo make install
+
+# copy *.h files
+cd /usr/local/include
+sudo cp /usr/local/include/glib-2.0/*.h . -fr
+sudo cp /usr/local/lib/glib-2.0/include/*.h . -fr
+sudo cp /usr/local/include/glib-2.0/glib/*.h . -fr
+
+# create a requried soft link libglib.so
+cd /usr/local/lib
+sudo ln -s /usr/local/lib/libglib-2.0.so /usr/local/lib/libglib.so
+
+# link automake to automake-1.14
+cd /usr/local/bin
+sudo rm /usr/local/bin/aclocal /usr/local/bin/automake -f
+sudo ln -s /usr/local/bin/aclocal-1.14 /usr/local/bin/aclocal
+sudo ln -s /usr/local/bin/automake-1.14 /usr/local/bin/automake
+
+# install destore
+git clone https://github.com/xpsair/destor.git
+cd destor
+./configure
+make
+automake --add-missing
+make
+sudo make install
+
+# make a dir as the working directory (e.g. /home/tong/destor/working)
+cd /home/tong/destor/
+mkdir working
+
+# configure your working directory in file 'destor.config'
+working-directory "/home/tong/destor/working/"
+
+# make dirs 'index' and 'recipes' in the working direcotry
+cd working
+mkdir index
+mkdir recipes
+
+# backup your data (e.g. the linux kernel source code directory)
+cd /home/tong/destor
+destor /home/tong/linux-4.8.0
